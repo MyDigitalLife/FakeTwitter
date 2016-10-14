@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="FakeTwitter" default="build" basedir=".">
+    <property environment="env"/>
+    <loadfile property="version" srcfile="${basedir}/VERSION"/>
+    <condition property="bat" value=".bat" else="">
+        <os family="windows" />
+    </condition>
+
+    <target name="test">
+        <delete dir="${basedir}/build"/>
+
+        <exec executable="php" failonerror="true">
+            <arg line="bin/console cache:clear --env=test"/>
+        </exec>
+
+        <!-- create db and load fixtures -->
+        <exec executable="php" failonerror="true">
+            <arg line="bin/console doctrine:database:drop --env=test --force"/>
+        </exec>
+
+        <exec executable="php" failonerror="true">
+            <arg line="bin/console doctrine:database:create --env=test"/>
+        </exec>
+
+        <exec executable="php" failonerror="true">
+            <arg line="bin/console doctrine:schema:create --env=test"/>
+        </exec>
+
+        <!-- run tests -->
+        <exec executable="phpunit${bat}">
+            <arg line="-c ${basedir}/app"/>
+        </exec>
+
+        <exec executable="php" failonerror="true">
+            <arg line="bin/console doctrine:database:drop --env=test --force"/>
+        </exec>
+    </target>
+
+    <target name="set_build_info" if="env.BUILD_NUMBER">
+        <echo message="${version}.${env.BUILD_NUMBER}" file="build.info"/>
+    </target>
+
+    <target name="get_build_info" if="env.build_info_file">
+        <copy file="${env.build_info_file}" tofile="${basedir}/build.info" overwrite="true" failonerror="false"/>
+    </target>
+
+    <target name="build" depends="test,set_build_info"/>
+
+    <target name="deploy" depends="get_build_info">
+        <mkdir dir="${basedir}/var/cache"/>
+        <mkdir dir="${basedir}/var/logs"/>
+        <chmod dir="${basedir}/var/cache" perm="777" />
+        <chmod dir="${basedir}/var/logs" perm="777" />
+
+        <exec executable="rsync">
+            <arg line="-e &quot;ssh -p ${env.ssh_port}&quot;" />
+            <arg line="-azC --force --delete --progress" />
+            <arg line="--exclude-from=app/config/rsync_exclude.txt" />
+            <arg line="./" />
+            <arg line="${env.ssh_user}@${env.ssh_host}:${env.server_path}" />
+        </exec>
+
+        <!-- update schema -->
+        <exec executable="ssh" failonerror="true">
+            <arg line="${env.ssh_user}@${env.ssh_host} -p ${env.ssh_port} 'sudo -u www-data php ${env.server_path}/bin/console doctrine:schema:update --force --env=${env.environment}'"/>
+        </exec>
+
+        <!-- sync db -->
+        <exec executable="ssh" failonerror="true">
+            <arg line="${env.ssh_user}@${env.ssh_host} -p ${env.ssh_port} 'sudo -u www-data php ${env.server_path}/bin/console zenstruck:db:sync --env=${env.environment}'"/>
+        </exec>
+
+        <!-- clear cache -->
+        <exec executable="ssh" failonerror="true">
+            <arg line="${env.ssh_user}@${env.ssh_host} -p ${env.ssh_port} 'sudo -u www-data php ${env.server_path}/bin/console cache:clear --env=${env.environment}'"/>
+        </exec>
+        <exec executable="ssh" failonerror="true">
+            <arg line="${env.ssh_user}@${env.ssh_host} -p ${env.ssh_port} 'sudo -u www-data php ${env.server_path}/bin/console cache:warmup --env=${env.environment}'"/>
+        </exec>
+    </target>
+</project>
