@@ -9,6 +9,10 @@
         <delete dir="${basedir}/build"/>
 
         <exec executable="php" failonerror="true">
+            <arg line="composer install --dev"/>
+        </exec>
+
+        <exec executable="php" failonerror="true">
             <arg line="bin/console cache:clear --env=test"/>
         </exec>
 
@@ -26,7 +30,7 @@
         </exec>
 
         <!-- run tests -->
-        <exec executable="phpunit${bat}">
+        <exec executable="vendor/bin/phpunit${bat}">
             <arg line="-c ${basedir}/app"/>
         </exec>
 
