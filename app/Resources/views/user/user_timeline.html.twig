@@ -1,0 +1,15 @@
+{% extends '::base.html.twig' %}
+
+{% block body %}
+    <h1>Timeline of {{ user.username }}</h1>
+    <div>
+        {% if app.user is not empty and user != app.user %}
+            <a href="{{ path('follow_user', {'username': user.username}) }}">follow</a>
+        {% endif %}
+    </div>
+    <ul>
+        {% for tweet in tweets %}
+            <li>{{ tweet.content|raw }} <br><span>Created on: {{ tweet.created|date('Y-m-d h:i:s') }}</span></li>
+        {% endfor %}
+    </ul>
+{% endblock %}

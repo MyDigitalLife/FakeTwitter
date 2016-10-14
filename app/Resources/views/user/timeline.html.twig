@@ -1,0 +1,10 @@
+{% extends '::base.html.twig' %}
+
+{% block body %}
+    <h1>Your Timeline</h1>
+    <ul>
+        {% for tweet in tweets %}
+            <li>{{ tweet.content|raw }} <br><span>Created on: {{ tweet.created|date('Y-m-d h:i:s') }}</span></li>
+        {% endfor %}
+    </ul>
+{% endblock %}

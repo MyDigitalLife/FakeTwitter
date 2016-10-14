@@ -1,0 +1,10 @@
+{% extends '::base.html.twig' %}
+{% block body %}
+    {% if app.user is not empty %}
+        {{ form_start(tweetForm) }}
+        {{ form_errors(tweetForm) }}
+        {{ form_row(tweetForm.content) }}
+        <button type="submit" >Tweet</button>
+        {{ form_end(tweetForm) }}
+    {% endif %}
+{% endblock %}

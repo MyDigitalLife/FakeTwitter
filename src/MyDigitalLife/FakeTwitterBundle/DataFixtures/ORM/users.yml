@@ -1,0 +1,16 @@
+MyDigitalLife\FakeTwitterBundle\Entity\User:
+  user_0:
+      username: spartan
+      email: p.e.smeets@gmail.com
+      plainPassword: test123
+      enabled: 1
+  user_1:
+      username: teeester
+      email: <email()>
+      plainPassword: <password()?
+      enabled: 1
+  user_{2..10}:
+      username: <username()>
+      email: <email()>
+      plainPassword: <password()>
+      enabled: 1

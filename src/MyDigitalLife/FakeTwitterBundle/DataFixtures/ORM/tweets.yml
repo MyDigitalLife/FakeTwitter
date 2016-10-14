@@ -1,0 +1,5 @@
+MyDigitalLife\FakeTwitterBundle\Entity\Tweet:
+    tweet_{1..100}:
+        author: '@user_*'
+        content: <sentence()>
+        created: <datetime()>

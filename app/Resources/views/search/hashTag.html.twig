@@ -1,0 +1,11 @@
+{% extends '::base.html.twig' %}
+
+{% block body %}
+    <ul>
+        {% for tweet in results %}
+            <li>
+                {{ tweet.content|raw }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
