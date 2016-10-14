@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <project name="FakeTwitter" default="build" basedir=".">
     <property environment="env"/>
-    <loadfile property="version" srcfile="${basedir}/VERSION"/>
     <condition property="bat" value=".bat" else="">
         <os family="windows" />
     </condition>
