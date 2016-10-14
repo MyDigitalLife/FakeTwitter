@@ -8,8 +8,8 @@
     <target name="test">
         <delete dir="${basedir}/build"/>
 
-        <exec executable="php" failonerror="true">
-            <arg line="composer install --dev"/>
+        <exec executable="composer" failonerror="true">
+            <arg line="install --dev"/>
         </exec>
 
         <exec executable="php" failonerror="true">
